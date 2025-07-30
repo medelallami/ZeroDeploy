@@ -1,0 +1,15 @@
+# FastAPI and server dependencies
+fastapi>=0.95.0
+uvicorn>=0.21.0
+pydantic>=1.10.7
+starlette>=0.26.1
+
+# Docker SDK
+docker>=6.0.1
+
+# TOML handling
+toml>=0.10.2
+
+# Utilities
+python-dotenv>=1.0.0
+requests>=2.28.2

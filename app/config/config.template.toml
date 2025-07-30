@@ -1,0 +1,12 @@
+# ZeroNSD Configuration Template
+# This file serves as a base for the dynamically generated config
+
+# Network domain suffix
+network = "vexinet.local"
+
+# Static services can be defined here
+# Dynamic container services will be added automatically
+[[services]]
+name = "dns.vexinet.local"
+type = "A"
+address = "127.0.0.1"
