@@ -1,0 +1,11 @@
+# ZeroNSD Configuration
+# This file will be overwritten by the ZeroDeploy service
+
+# Network domain suffix
+network = "vexinet.local"
+
+# Static DNS entries
+[[services]]
+name = "dns.vexinet.local"
+type = "A"
+address = "127.0.0.1"

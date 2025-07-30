@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  web-server:
+    image: nginx:latest
+    container_name: zerodeploy-web
+    volumes:
+      - ./app/frontend:/usr/share/nginx/html
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    
+  api-server:
+    image: python:3.9-slim
+    container_name: zerodeploy-api
+    volumes:
+      - type: bind
+        source: ./app
+        target: /app
+    working_dir: /app
+    command: sh -c "pip install fastapi uvicorn && python -m uvicorn index:app --host 0.0.0.0 --port 8000"
+    ports:
+      - "8000:8000"
+    environment:
+      - DOMAIN_SUFFIX=vexinet.local
+    restart: unless-stopped
+
+networks:
+  zerodeploy-network:
+    driver: bridge

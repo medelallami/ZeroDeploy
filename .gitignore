@@ -1,0 +1,26 @@
+# Node.js dependencies
+node_modules/
+
+# Python virtual environment
+venv/
+.env
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Build outputs
+/app/frontend/dist/
+/app/frontend/.vite/
+
+# Editor directories and files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS specific files
+.DS_Store
+Thumbs.db
