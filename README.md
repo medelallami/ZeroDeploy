@@ -3,9 +3,9 @@
 ZeroDeploy is a local DNS management tool that automatically maps Docker containers to domain names within a ZeroTier network. It provides a web dashboard for easy management and configuration.
 
 ## Disclaimer
-⚠️ The project is under very active development.
-⚠️ Expect bugs and breaking changes.
-⚠️ Do not use the app as the only way to store your photos and videos.
+- ⚠️ The project is under very active development.
+- ⚠️ Expect bugs and breaking changes.
+- ⚠️ Do not use the app as the only way to store your photos and videos.
 
 ## Features
 
