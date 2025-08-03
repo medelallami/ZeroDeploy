@@ -9,8 +9,11 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:8000',
         changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '/api')
       }
-    }
+    },
+    host: true,
+    port: 3000
   },
   build: {
     outDir: 'dist',

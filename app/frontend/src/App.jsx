@@ -4,6 +4,7 @@ import axios from 'axios'
 import Header from './components/Header'
 import ContainerList from './components/ContainerList'
 import DomainSettings from './components/DomainSettings'
+import Dashboard from './components/Dashboard'
 import LoadingSpinner from './components/LoadingSpinner'
 import RemoteHostForm from './components/RemoteHostForm'
 
@@ -16,6 +17,8 @@ function App() {
   const [domainSuffix, setDomainSuffix] = useState('vexinet.local')
   const [remoteHost, setRemoteHost] = useState('')
   const [isRemoteConnected, setIsRemoteConnected] = useState(false)
+  const [selectedContainer, setSelectedContainer] = useState(null)
+  const [activeTab, setActiveTab] = useState('containers') // 'containers', 'dashboard'
 
   // Fetch containers and domains on component mount
   useEffect(() => {
@@ -67,6 +70,11 @@ function App() {
           : container
       )
     )
+  }
+
+  const handleSelectContainer = (container) => {
+    setSelectedContainer(container)
+    setActiveTab('dashboard')
   }
 
   const handleConnectRemote = async (remoteHostUrl) => {
@@ -150,16 +158,16 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 dark:text-white transition-colors duration-200">
       <Header domainSuffix={domainSuffix} />
       
       {error ? (
         <div className="container mx-auto p-4 mt-8 text-center">
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
+          <div className="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 text-red-700 dark:text-red-200 p-4 rounded">
             <p>{error}</p>
             <button 
               onClick={() => fetchData()} 
-              className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              className="mt-2 bg-blue-500 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-800 text-white font-bold py-2 px-4 rounded transition-colors duration-200"
             >
               Retry
             </button>
@@ -175,28 +183,57 @@ function App() {
               currentHost={remoteHost}
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-2">
-              <ContainerList 
-                containers={containers} 
-                onToggleDomain={handleToggleDomain} 
-                domainSuffix={domainSuffix}
-                isRemoteConnected={isRemoteConnected}
-                remoteHost={remoteHost}
-              />
-            </div>
-            <div className="md:col-span-1">
-              <DomainSettings 
-                onReload={handleReloadConfig} 
-                reloading={reloading} 
-                containerCount={containers.length}
-                enabledCount={containers.filter(c => c.dns_enabled).length}
-                domainSuffix={domainSuffix}
-                isRemoteConnected={isRemoteConnected}
-                remoteHost={remoteHost}
-              />
+          <div className="mb-6">
+            <div className="border-b border-gray-200 dark:border-gray-700">
+              <nav className="-mb-px flex space-x-8">
+                <button
+                  onClick={() => setActiveTab('containers')}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${activeTab === 'containers' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'}`}
+                >
+                  Containers & DNS
+                </button>
+                <button
+                  onClick={() => setActiveTab('dashboard')}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${activeTab === 'dashboard' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'}`}
+                  disabled={!selectedContainer}
+                >
+                  Dashboard
+                </button>
+              </nav>
             </div>
           </div>
+
+          {activeTab === 'containers' ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-2">
+                <ContainerList 
+                  containers={containers} 
+                  onToggleDomain={handleToggleDomain} 
+                  domainSuffix={domainSuffix}
+                  isRemoteConnected={isRemoteConnected}
+                  remoteHost={remoteHost}
+                  onSelectContainer={handleSelectContainer}
+                />
+              </div>
+              <div className="md:col-span-1">
+                <DomainSettings 
+                  onReload={handleReloadConfig} 
+                  reloading={reloading} 
+                  containerCount={containers.length}
+                  enabledCount={containers.filter(c => c.dns_enabled).length}
+                  domainSuffix={domainSuffix}
+                  isRemoteConnected={isRemoteConnected}
+                  remoteHost={remoteHost}
+                />
+              </div>
+            </div>
+          ) : (
+            <Dashboard 
+              selectedContainer={selectedContainer}
+              isRemoteConnected={isRemoteConnected}
+              remoteHost={remoteHost}
+            />
+          )}
         </div>
       )}
     </div>
