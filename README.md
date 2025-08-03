@@ -1,61 +1,215 @@
-# ZeroDeploy
+# ZeroDeploy 🚀
 
-ZeroDeploy is a local DNS management tool that automatically maps Docker containers to domain names within a ZeroTier network. It provides a web dashboard for easy management and configuration.
+**ZeroDeploy** is a powerful local DNS management tool that automatically maps Docker containers to domain names within a ZeroTier network. With an enhanced web dashboard, dark mode support, and intelligent deployment features, managing your container domains has never been easier.
 
-## Features
+## 🌟 What's New
 
-- **Docker Container Monitoring**: Automatically detects running containers and their exposed ports
-- **Dynamic DNS Configuration**: Generates ZeroNSD configuration files based on container information
-- **Web Dashboard**: Provides a user-friendly interface to manage domain mappings
-- **API Endpoints**: Offers REST API for programmatic control
-- **Dockerized Deployment**: Easy setup with Docker Compose
+- ✨ **Dark Mode Support** - System preference detection with manual toggle
+- 🔄 **Automatic Port Randomization** - Prevents port conflicts during deployment
+- 🎯 **Optional Domain Configuration** - No more hardcoded domain suffixes
+- 🚀 **Enhanced Deployment Scripts** - Cross-platform deployment made simple
+- 📊 **Container Statistics** - Real-time container resource monitoring
+- 📝 **DNS Logging** - Comprehensive DNS query logging and analysis
 
-## System Components
+## ⚠️ Disclaimer
+- The project is under active development
+- Expect bugs and breaking changes
+- Suitable for development and testing environments
 
-1. **Docker Monitor Module**: Watches Docker containers and extracts container information
-2. **ZeroNSD Config Generator**: Converts container info into DNS configuration
-3. **Web API (FastAPI)**: Exposes endpoints to manage domains and configuration
-4. **Web Dashboard**: Provides a user interface for domain management
+## 🚀 Key Features
 
-## Getting Started
+### Core Features
+- **Smart Container Discovery** - Automatically detects running containers and exposed ports
+- **Dynamic DNS Management** - Real-time DNS configuration updates based on container state
+- **ZeroTier Integration** - Seamless DNS resolution across ZeroTier networks
+- **RESTful API** - Complete programmatic control via REST endpoints
+
+### Enhanced Features
+- **Dark Mode Interface** - Modern UI with system preference detection
+- **Container Analytics** - Real-time CPU, memory, and network statistics
+- **DNS Query Logging** - Detailed DNS request monitoring and analysis
+- **Health Monitoring** - Built-in health checks for all services
+- **Port Conflict Prevention** - Automatic port detection and assignment
+
+## 🏗️ System Architecture
+
+### Core Components
+1. **Container Monitor Service** - Real-time Docker container state tracking
+2. **DNS Configuration Engine** - Dynamic ZeroNSD configuration generation
+3. **REST API Server** - FastAPI-based management endpoints
+4. **Modern Web Dashboard** - React-based responsive interface
+5. **Deployment Automation** - Cross-platform deployment scripts
+
+### Enhanced Components
+- **Statistics Collector** - Container resource usage monitoring
+- **DNS Logger** - Query logging and analysis system
+- **Health Check System** - Service availability monitoring
+- **Port Manager** - Automatic port conflict resolution
+
+## 🚀 Quick Start
 
 ### Prerequisites
+- Docker and Docker Compose installed
+- ZeroTier network configured (optional)
+- Git for cloning the repository
 
-- Docker and Docker Compose
-- ZeroTier network setup
+### One-Command Deployment
 
-### Installation
+#### Linux/macOS
+```bash
+git clone https://github.com/yourusername/ZeroDeploy.git
+cd ZeroDeploy
+./deploy.sh
+```
 
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/yourusername/ZeroDeploy.git
-   cd ZeroDeploy
-   ```
+#### Windows
+```powershell
+git clone https://github.com/yourusername/ZeroDeploy.git
+cd ZeroDeploy
+.\deploy.bat
+```
 
-2. Start the application:
-   ```bash
-   docker-compose up -d
-   ```
+### Manual Deployment
+```bash
+# Clone repository
+git clone https://github.com/yourusername/ZeroDeploy.git
+cd ZeroDeploy
 
-3. Access the web dashboard at http://localhost:8000
+# Copy environment template
+cp .env.example .env
 
-## Configuration
+# Edit configuration as needed
+nano .env
 
-The following environment variables can be configured in the docker-compose.yml file:
+# Deploy with Docker Compose
+docker-compose up -d
+```
 
-- `DOMAIN_SUFFIX`: The domain suffix to use (default: vexinet.local)
-- `ZERO_TIER_INTERFACE`: Optional interface binding
-- `DNS_CONFIG_PATH`: Path to ZeroNSD config file
+## ⚙️ Configuration
 
-## Usage
+### Environment Variables
+Configure your deployment using the `.env` file:
 
-Once the application is running, you can:
+```bash
+# Application Settings
+ENVIRONMENT=production
+ZERO_DEPLOY_PORT=auto           # Auto-detect available port
+DOMAIN_SUFFIX=                  # Optional domain suffix
 
-1. View all running containers in the web dashboard
-2. Enable/disable domain mappings for specific containers
-3. Manually trigger DNS configuration reload
-4. Access containers using their domain names from any device on the ZeroTier network
+# Docker Settings
+DOCKER_NETWORK=zerodeploy_default
+DOCKER_RESTART_POLICY=unless-stopped
 
-## License
+# Advanced Settings
+HEALTH_CHECK_INTERVAL=30s
+LOG_LEVEL=info
+```
 
-MIT
+### Port Configuration
+- **Automatic Detection**: Uses `check-ports.sh`/`check-ports.bat` to find available ports
+- **Manual Override**: Set `ZERO_DEPLOY_PORT=8080` for specific port
+- **Development Mode**: Uses `docker-compose.dev.yml` for hot-reload development
+
+## 🖥️ Web Dashboard
+
+### Access Points
+- **Main Dashboard**: http://localhost:[auto-detected-port]
+- **API Documentation**: http://localhost:[port]/docs
+- **Health Check**: http://localhost:[port]/health
+
+### Features
+- **Dark Mode Toggle** - Automatic system preference detection
+- **Container Management** - Start, stop, and configure containers
+- **Domain Mapping** - Assign custom domains to containers
+- **Real-time Statistics** - Live container resource usage
+- **DNS Query Logs** - View and analyze DNS requests
+
+## 🔧 Advanced Usage
+
+### Development Mode
+```bash
+# Start in development mode with hot-reload
+./deploy.sh --env dev --port 3000
+```
+
+### Custom Domain Configuration
+```bash
+# Deploy with custom domain suffix
+./deploy.sh --domain mycompany.local
+```
+
+### Port Management
+```bash
+# Check available ports
+./check-ports.sh          # Linux/macOS
+.\check-ports.bat        # Windows
+
+# Deploy on specific port
+./deploy.sh --port 8080
+```
+
+## 📊 Container Statistics
+
+Monitor your containers with real-time metrics:
+- **CPU Usage** - Per-container CPU utilization
+- **Memory Usage** - RAM consumption tracking
+- **Network I/O** - Traffic monitoring
+- **Container Health** - Service availability status
+
+## 📝 DNS Logging
+
+Comprehensive DNS query analysis:
+- **Query Tracking** - Log all DNS requests
+- **Response Analysis** - Monitor DNS resolution
+- **Performance Metrics** - Query response times
+- **Error Detection** - Identify DNS issues
+
+## 🐛 Troubleshooting
+
+### Common Issues
+- **Port Conflicts**: Use automatic port detection
+- **Permission Errors**: Ensure Docker daemon access
+- **Network Issues**: Check ZeroTier network configuration
+
+### Debug Mode
+```bash
+# Enable debug logging
+LOG_LEVEL=debug ./deploy.sh
+```
+
+### Health Checks
+- Container health monitoring
+- Service availability checks
+- DNS resolution verification
+
+## 🌐 ZeroTier Integration
+
+### Network Setup
+1. Create ZeroTier network at https://my.zerotier.com
+2. Join your devices to the network
+3. Configure ZeroDeploy with your network ID
+4. Access containers via domain names from any network device
+
+### Domain Resolution
+- **Local Network**: http://container-name.local
+- **ZeroTier Network**: http://container-name.yourdomain.local
+- **Cross-Platform**: Works on Windows, macOS, Linux, and mobile devices
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [ZeroTier](https://www.zerotier.com/) for the excellent networking platform
+- [Docker](https://www.docker.com/) for containerization
+- [FastAPI](https://fastapi.tiangolo.com/) for the web framework
+- [React](https://reactjs.org/) for the frontend framework
+
+---
+
+**Made with ❤️ by the ZeroDeploy Community**
