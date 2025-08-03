@@ -212,4 +212,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
+⚠️ **Important**: ZeroDeploy is a container deployment and DNS management tool. Always maintain proper backups and don't rely solely on automated deployments for critical services.
+
 **Made with ❤️ for the selfhosting community**
