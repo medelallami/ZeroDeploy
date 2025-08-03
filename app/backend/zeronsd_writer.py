@@ -3,6 +3,7 @@ import toml
 import docker
 import logging
 from typing import List, Dict, Any, Optional
+from backend.dns_logs import log_dns_access
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

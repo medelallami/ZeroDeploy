@@ -22,9 +22,9 @@ COPY --from=frontend /frontend/dist ./frontend/
 # Copy config templates
 COPY config/ ./config/
 
-# Install Python dependencies
+# Copy requirements first for better caching
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Expose API port
 EXPOSE 8000

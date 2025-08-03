@@ -1,14 +1,16 @@
 import os
 import uvicorn
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Query
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict, Any, Optional
 
 # Import local modules
-from docker_scan import get_running_containers
-from zeronsd_writer import generate_config, reload_zeronsd
+from backend.docker_scan import get_running_containers, get_container_by_name
+from backend.zeronsd_writer import generate_config, reload_zeronsd
+from backend.container_stats import get_container_stats, get_container_logs
+from backend.dns_logs import log_dns_access, get_recent_dns_accesses
 
 # Initialize FastAPI app
 app = FastAPI(title="ZeroDeploy", description="Local DNS management for Docker containers")
@@ -99,6 +101,49 @@ async def force_reload():
     try:
         success = reload_zeronsd()
         return {"success": success, "message": "DNS service reloaded"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+        
+@app.get("/api/containers/{container_id}/stats", response_model=Dict[str, Any])
+async def get_stats(container_id: str, remote_host: str = None):
+    """Get statistics for a specific container"""
+    try:
+        stats = get_container_stats(container_id, remote_host)
+        return stats
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/containers/{container_id}/logs", response_model=List[Dict[str, Any]])
+async def get_logs(container_id: str, lines: int = Query(100, ge=1, le=1000), remote_host: str = None):
+    """Get logs for a specific container"""
+    try:
+        logs = get_container_logs(container_id, lines, remote_host)
+        return logs
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/dns/logs", response_model=List[Dict[str, Any]])
+async def get_dns_logs(count: int = Query(5, ge=1, le=100)):
+    """Get recent DNS access logs"""
+    try:
+        logs = get_recent_dns_accesses(count)
+        return logs
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/dns/logs")
+async def add_dns_log(request: Request):
+    """Add a DNS access log entry"""
+    try:
+        data = await request.json()
+        ip_address = data.get("ip_address")
+        domain = data.get("domain")
+        
+        if not ip_address or not domain:
+            raise HTTPException(status_code=400, detail="IP address and domain are required")
+            
+        log_dns_access(ip_address, domain)
+        return {"success": True, "message": "DNS access logged successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
