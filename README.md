@@ -16,11 +16,6 @@
 - 📊 **Container Statistics** - Real-time container resource monitoring
 - 📝 **DNS Logging** - Comprehensive DNS query logging and analysis
 
-## ⚠️ Disclaimer
-- The project is under active development
-- Expect bugs and breaking changes
-- Suitable for development and testing environments
-
 ## 🚀 Key Features
 
 ### Core Features
