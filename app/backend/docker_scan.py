@@ -1,4 +1,5 @@
 import docker
+import os
 from typing import List, Dict, Any, Optional
 import logging
 
@@ -42,13 +43,20 @@ def get_running_containers(remote_host: str = None) -> List[Dict[str, Any]]:
             if name.startswith('/'):
                 name = name[1:]
                 
-            # Get container IP address (from first network)
+            # Get container IP address
             ip_address = ""
             networks = details.get('NetworkSettings', {}).get('Networks', {})
             if networks:
-                # Get the first network's IP
-                first_network = next(iter(networks.values()))
-                ip_address = first_network.get('IPAddress', '')
+                # Check if a specific network is configured
+                target_network_name = os.getenv('DOCKER_NETWORK')
+
+                if target_network_name and target_network_name in networks:
+                    # Use IP from the configured network
+                    ip_address = networks[target_network_name].get('IPAddress', '')
+                else:
+                    # Fallback to the first network's IP
+                    first_network = next(iter(networks.values()))
+                    ip_address = first_network.get('IPAddress', '')
             
             # Get exposed ports
             ports = []
