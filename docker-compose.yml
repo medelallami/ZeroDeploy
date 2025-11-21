@@ -22,7 +22,9 @@ services:
       start_period: 40s
     labels:
       - "com.zerodeploy.service=main"
-      - "com.zerodeploy.version=1.0"
+      - "com.zerodeploy.version=1.1"
+    volumes:
+      - zerodeploy-data:/data
 
 networks:
   default:
@@ -30,4 +32,6 @@ networks:
 
 volumes:
   zerodeploy-pip-cache:
+    driver: local
+  zerodeploy-data:
     driver: local

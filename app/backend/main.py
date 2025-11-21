@@ -11,9 +11,10 @@ from backend.docker_scan import get_running_containers, get_container_by_name
 from backend.zeronsd_writer import generate_config, reload_zeronsd
 from backend.container_stats import get_container_stats, get_container_logs
 from backend.dns_logs import log_dns_access, get_recent_dns_accesses
+from backend.config_manager import get_disabled_containers, set_disabled_containers
 
 # Initialize FastAPI app
-app = FastAPI(title="ZeroDeploy", description="Local DNS management for Docker containers")
+app = FastAPI(title="ZeroDeploy", description="Local DNS management for Docker containers", version="1.1")
 
 # Add CORS middleware
 app.add_middleware(
@@ -34,6 +35,14 @@ async def list_containers(remote_host: str = None):
     """Get all running containers with their DNS status"""
     try:
         containers = get_running_containers(remote_host)
+
+        # Apply local overrides for DNS status
+        if not remote_host:  # Only apply persistence for local host for now
+            disabled_ids = get_disabled_containers()
+            for container in containers:
+                if container['id'] in disabled_ids:
+                    container['dns_enabled'] = False
+
         return containers
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -49,6 +58,8 @@ async def scan_remote_host(request: Request):
             raise HTTPException(status_code=400, detail="Remote host URL is required")
             
         containers = get_running_containers(remote_host)
+        # Remote host persistence logic is not implemented yet,
+        # as settings.json is local to this container.
         return {"success": True, "containers": containers, "remote_host": remote_host}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -60,6 +71,14 @@ async def get_domains(remote_host: str = None):
         # This would need to parse the current config.toml
         # For now, we'll just return the containers with domain info
         containers = get_running_containers(remote_host)
+
+        # Apply local overrides for DNS status
+        if not remote_host:
+            disabled_ids = get_disabled_containers()
+            for container in containers:
+                if container['id'] in disabled_ids:
+                    container['dns_enabled'] = False
+
         domains = {}
         
         for container in containers:
@@ -88,6 +107,31 @@ async def update_domains(request: Request):
         if not success:
             raise HTTPException(status_code=500, detail="Failed to generate DNS configuration")
         
+        # Save disabled containers for persistence (only for local host)
+        if not remote_host:
+            # Load current disabled list
+            current_disabled = get_disabled_containers()
+
+            # Process the incoming update
+            updated_disabled = set(current_disabled)
+
+            for container in container_configs:
+                container_id = container.get("id")
+                if not container_id:
+                    continue
+
+                is_enabled = container.get("dns_enabled", True)
+
+                if is_enabled:
+                    # If explicitly enabled, remove from disabled list
+                    if container_id in updated_disabled:
+                        updated_disabled.remove(container_id)
+                else:
+                    # If explicitly disabled, add to disabled list
+                    updated_disabled.add(container_id)
+
+            set_disabled_containers(list(updated_disabled))
+
         # Reload ZeroNSD
         reload_success = reload_zeronsd()
         

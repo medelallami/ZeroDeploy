@@ -16,6 +16,7 @@ services:
     volumes:
       - ./app:/app
       - /app/__pycache__
+      - zerodeploy-data:/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -30,4 +31,6 @@ networks:
 
 volumes:
   zerodeploy-pip-cache:
+    driver: local
+  zerodeploy-data:
     driver: local
