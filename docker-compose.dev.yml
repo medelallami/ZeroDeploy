@@ -12,6 +12,7 @@ services:
       - DOMAIN_SUFFIX=${DOMAIN_SUFFIX:-}
       - ENVIRONMENT=development
       - DEBUG=true
+      - DOCKER_NETWORK=${DOCKER_NETWORK:-}
     volumes:
       - ./app:/app
       - /app/__pycache__

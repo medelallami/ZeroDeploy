@@ -12,6 +12,7 @@ services:
       - DOMAIN_SUFFIX=${DOMAIN_SUFFIX:-}
       - ENVIRONMENT=production
       - NODE_ENV=production
+      - DOCKER_NETWORK=${DOCKER_NETWORK:-}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
