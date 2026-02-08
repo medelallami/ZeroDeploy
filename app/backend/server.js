@@ -315,6 +315,15 @@ app.post('/api/dns/logs', (req, res) => {
     res.json({ success: true, message: 'DNS access logged successfully' });
 });
 
+// Serve frontend static files
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+// SPA fallback
+app.get(/.*/, (req, res) => {
+    if (req.path.startsWith("/api")) return res.status(404).json({ error: "Not found" });
+    res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+});
+
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
