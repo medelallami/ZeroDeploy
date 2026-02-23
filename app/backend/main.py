@@ -1,10 +1,16 @@
 import os
+import toml
+import logging
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request, Query
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict, Any, Optional
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Import local modules
 from backend.docker_scan import get_running_containers, get_container_by_name
@@ -57,18 +63,40 @@ async def scan_remote_host(request: Request):
 async def get_domains(remote_host: str = None):
     """Get current DNS configuration"""
     try:
-        # This would need to parse the current config.toml
-        # For now, we'll just return the containers with domain info
+        # Parse the current config.toml
+        config_services = []
+        if os.path.exists(DNS_CONFIG_PATH):
+            try:
+                config_data = toml.load(DNS_CONFIG_PATH)
+                config_services = config_data.get("services", [])
+            except Exception as e:
+                logger.error(f"Error parsing {DNS_CONFIG_PATH}: {e}")
+
+        # Create a mapping of FQDN to entry for quick lookup
+        dns_entries = {s.get("name"): s for s in config_services if "name" in s}
+
         containers = get_running_containers(remote_host)
         domains = {}
         
         for container in containers:
             container_name = container["name"]
-            domains[container_name] = {
-                "name": f"{container_name}.{DOMAIN_SUFFIX}",
-                "enabled": container.get("dns_enabled", True),
-                "address": container.get("ip_address", "")
-            }
+            fqdn = f"{container_name}.{DOMAIN_SUFFIX}"
+
+            # Check if this container has an entry in config.toml
+            entry = dns_entries.get(fqdn)
+
+            if entry:
+                domains[container_name] = {
+                    "name": fqdn,
+                    "enabled": True,
+                    "address": entry.get("address", container.get("ip_address", ""))
+                }
+            else:
+                domains[container_name] = {
+                    "name": fqdn,
+                    "enabled": False,
+                    "address": container.get("ip_address", "")
+                }
             
         return {"domains": domains, "domain_suffix": DOMAIN_SUFFIX, "remote_host": remote_host}
     except Exception as e:
