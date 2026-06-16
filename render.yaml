@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: zerodeploy
+    env: node
+    buildCommand: ./render-build.sh
+    startCommand: cd app/backend && npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.0
+    plan: free
+    region: oregon
